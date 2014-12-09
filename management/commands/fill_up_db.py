@@ -32,7 +32,8 @@ def fill_up_db(postcode_filename, chunk_size=500):
                 PostcodeMapping.objects.bulk_create(chunk)
             except KeyboardInterrupt:
                 raise
-            except:
+            except Exception as e:
+                # print e.message, e.args, str(e.__class__)
                 failed_chunks += chunk
                 print "Chunk failed. Will retry at the end."
                 continue
