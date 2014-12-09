@@ -1,17 +1,24 @@
 __author__ = 'scotm'
 # Converts postcode.csv files available from the following address:
 # http://www.ordnancesurvey.co.uk/business-and-government/products/code-point-open.html
-import time
 import csv
-from itertools import imap
+from itertools import imap, izip_longest
 from django.contrib.gis.geos import Point
 from django.core.management.base import BaseCommand
 from postcode_locator.models import PostcodeMapping
+from postcode_locator.constants import postcodeareas
 
-from core.utilities.constants import postcodeareas
-from core.utilities.functions import chunked
+postcodes_already = set(PostcodeMapping.objects.all().values_list('postcode', flat=True))
 
-postcodes_already = set(PostcodeMapping.objects.all().values_list('postcode',flat=True))
+
+def chunked(iterable, n):
+    _marker = object()
+    for group in (list(g) for g in izip_longest(*[iter(iterable)] * n, fillvalue=_marker)):
+        if group[-1] is _marker:
+            # If this is the last group, remove the padding:
+            del group[group.index(_marker):]
+        yield group
+
 
 def process_postcode_data(line):
     return PostcodeMapping(postcode=line['postcode'],
