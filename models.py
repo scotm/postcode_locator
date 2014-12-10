@@ -14,8 +14,13 @@ class PostcodeMapping(models.Model):
         return self.postcode
 
     @staticmethod
-    def match_postcode(postcode):
-        return PostcodeMapping.objects.get(postcode=postcode.replace(' ', ''))
+    def match_postcode(postcode, raise_exceptions=True):
+        try:
+            return PostcodeMapping.objects.get(postcode=postcode.replace(' ', ''))
+        except PostcodeMapping.DoesNotExist:
+            if raise_exceptions:
+                raise
+            return None
 
     @staticmethod
     def make_postcodemapping(postcode, lat, long):
