@@ -47,11 +47,8 @@ def fill_up_db(postcode_filename, chunk_size=500):
                 continue
             i += len(chunk)
 
-    if failed_chunks:
-        print("Applying %d failed chunks individually" % (len(failed_chunks)))
     for i in failed_chunks:
         try:
-            print("Trying %s" % i.postcode)
             i.save()
         except:
             print("%s failed" % unicode(i))
@@ -64,5 +61,6 @@ class Command(BaseCommand):
         parser.add_argument('filename', nargs=1, type=unicode)
 
     def handle(self, *args, **options):
-        filename = args[0]
-        fill_up_db(filename)
+        filenames = options['filename']
+        for filename in filenames:
+            fill_up_db(filename)
