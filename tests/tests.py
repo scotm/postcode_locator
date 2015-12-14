@@ -2,6 +2,7 @@ from django.contrib.gis.geos import Point
 from django.test import TestCase
 
 from postcode_locator.models import PostcodeMapping
+from postcode_locator.tests.factories import PostcodeMappingFactory
 
 
 class MatchPostcodeTest(TestCase):
@@ -19,3 +20,8 @@ class MatchPostcodeTest(TestCase):
         self.assertEqual(PostcodeMapping.match_postcode('EH6 7HQ').point, point)
         self.assertEqual(PostcodeMapping.match_postcode('EH67HQ').point, point)
         self.assertEqual(PostcodeMapping.match_postcode('EH6  7HQ').point, point)
+
+    def test_postcodemappingfactory(self):
+        p = PostcodeMappingFactory.create()
+        q = PostcodeMappingFactory.create()
+        self.assertNotEqual(p.point, q.point)
