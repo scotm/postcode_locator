@@ -9,8 +9,10 @@ from postcode_locator.models import PostcodeMapping
 
 latitudes = (56.4740473445564, 56.47997257534551)
 longitudes = (-2.937769889831543, -2.9126644134521484)
+northwest = (latitudes[1], longitudes[0])
 northeast = (latitudes[1], longitudes[1])
 southwest = (latitudes[0], longitudes[0])
+southeast = (latitudes[0], longitudes[1])
 
 class PostcodeMappingFactory(factory.DjangoModelFactory):
     class Meta:
