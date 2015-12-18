@@ -16,7 +16,7 @@ class PostcodeMapping(models.Model):
     @staticmethod
     def match_postcode(postcode, raise_exceptions=True):
         try:
-            return PostcodeMapping.objects.get(postcode=postcode.upper().replace(' ',''))
+            return PostcodeMapping.objects.get(postcode=postcode.upper().replace(' ', ''))
         except PostcodeMapping.DoesNotExist:
             try:
                 PostcodeMapping.objects.get(postcode=postcode)
@@ -32,5 +32,5 @@ class PostcodeMapping(models.Model):
     objects = models.GeoManager()
 
     def save(self, *args, **kwargs):
-        self.postcode = self.postcode.upper().replace(' ','')
+        self.postcode = self.postcode.upper().replace(' ', '')
         super(PostcodeMapping, self).save(*args, **kwargs)
