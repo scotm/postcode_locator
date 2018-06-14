@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from models import PostcodeMapping
+from .models import PostcodeMapping
 
 
 class PostcodeMappingAdmin(admin.ModelAdmin):

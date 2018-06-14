@@ -1,7 +1,7 @@
 __author__ = 'scotm'
 from django.contrib.gis.db import models
 from django.contrib.gis.geos import Point
-
+from django.db.models import Manager as GeoManager
 
 class PostcodeMapping(models.Model):
     postcode = models.CharField(max_length=10, primary_key=True)
@@ -10,7 +10,7 @@ class PostcodeMapping(models.Model):
     point = models.PointField()
     scraped = models.BooleanField(default=False, db_index=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.postcode
 
     @staticmethod
@@ -26,4 +26,4 @@ class PostcodeMapping(models.Model):
     def make_postcodemapping(postcode, lat, long):
         return PostcodeMapping(postcode=postcode, point=Point(long, lat))
 
-    objects = models.GeoManager()
+    objects = GeoManager()

@@ -54,7 +54,7 @@ def fill_up_db(postcode_filename, chunk_size=500):
             print("Trying %s" % i.postcode)
             i.save()
         except:
-            print("%s failed" % unicode(i))
+            print("%s failed" % i)
 
 
 class Command(BaseCommand):
