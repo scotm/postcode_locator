@@ -4,7 +4,11 @@ __author__ = 'scotm'
 # Converts postcode.csv files available from the following address:
 # http://www.ordnancesurvey.co.uk/business-and-government/products/code-point-open.html
 import csv
-from itertools import imap, izip_longest
+try:
+    from itertools import imap, izip_longest
+except ImportError:
+    from itertools import zip_longest as izip_longest
+    imap=map
 from django.contrib.gis.geos import Point
 from django.core.management.base import BaseCommand
 from postcode_locator.models import PostcodeMapping
@@ -23,20 +27,26 @@ def chunked(iterable, n):
 
 
 def process_postcode_data(line):
-    return PostcodeMapping(postcode=line['postcode'],
-                           point=Point(float(line['longitude']), float(line['latitude'])))
+    line['postcode'] = line['postcode'].replace(" ","")
+    if 'longitude' in line and 'latitude' in line:
+        return PostcodeMapping(postcode=line['postcode'], point=Point(float(line['longitude']), float(line['latitude'])))
+    if 'Eastings' in line and 'Northings' in line:
+        pnt = Point(float(line['Eastings']), float(line['Northings']), srid=27700)
+        pnt.transform(4326)
+        return PostcodeMapping(postcode=line['postcode'], point=pnt)
 
 
-def fill_up_db(postcode_filename, chunk_size=500):
+def fill_up_db(postcode_filename, chunk_size=5):
     i = 0
     with open(postcode_filename) as myfile:
         # Read in the postcodes file - and remove duplicates
         print("Reading in postcode file")
         reader = (i for i in csv.DictReader(myfile) if i['postcode'][:2] in postcodeareas)
-        reader = (x for x in reader if x['postcode'] not in postcodes_already)
+        reader = (x for x in reader if x['postcode'].replace(" ","") not in postcodes_already)
         chunker = chunked(imap(process_postcode_data, reader), chunk_size)
         failed_chunks = []
         for chunk in chunker:
+            print(chunk)
             try:
                 PostcodeMapping.objects.bulk_create(chunk)
             except KeyboardInterrupt:
@@ -61,8 +71,11 @@ class Command(BaseCommand):
     help = 'Fills up the DB with postcode points'
 
     def add_arguments(self, parser):
-        parser.add_argument('filename', nargs=1, type=unicode)
+        parser.add_argument('filename', nargs=1)
 
     def handle(self, *args, **options):
-        filename = args[0]
+        try:
+            filename = args[0]
+        except IndexError:
+            filename = options['filename'][0]
         fill_up_db(filename)
