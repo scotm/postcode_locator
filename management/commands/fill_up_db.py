@@ -57,11 +57,8 @@ def fill_up_db(postcode_filename, chunk_size=5):
                 continue
             i += len(chunk)
 
-    if failed_chunks:
-        print("Applying %d failed chunks individually" % (len(failed_chunks)))
     for i in failed_chunks:
         try:
-            print("Trying %s" % i.postcode)
             i.save()
         except:
             print("%s failed" % i)

@@ -1,14 +1,13 @@
 # Create your views here.
-from json_views.views import JSONDataView
+from django.http import JsonResponse
 
 from postcode_locator.models import PostcodeMapping
 
 
-class PostcodeMappingView(JSONDataView):
-    def get_context_data(self, **kwargs):
-        context = super(PostcodeMappingView, self).get_context_data(**kwargs)
-        mapping = PostcodeMapping.match_postcode(postcode=self.request.GET.get('postcode', None),
-                                                 raise_exceptions=False)
-        if mapping:
-            context.update({'data': mapping.point})
-        return context
+def postcodemapping_json_view(request):
+    mapping = PostcodeMapping.match_postcode(postcode=request.GET.get('postcode', None),
+                                             raise_exceptions=False)
+    data = {'outcome': 'fail'}
+    if mapping:
+        data = {'outcome': 'success', 'point': [mapping.point.x, mapping.point.y]}
+    return JsonResponse(data=data)
